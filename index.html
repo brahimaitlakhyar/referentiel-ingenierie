@@ -14,6 +14,20 @@ header{
   background:#f37021;
   color:white;
   padding:20px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+header img{
+  height:70px;
+}
+header h1{
+  margin:0;
+  font-size:26px;
+}
+header p{
+  margin:5px 0 0;
+  font-size:14px;
 }
 main{
   padding:30px;
@@ -25,7 +39,10 @@ main{
   box-shadow:0 3px 10px rgba(0,0,0,.1);
   margin-bottom:20px;
 }
-h2,h3{color:#f37021;margin-top:0}
+h2,h3{
+  color:#f37021;
+  margin-top:0;
+}
 button{
   background:#f37021;
   color:white;
@@ -34,70 +51,93 @@ button{
   cursor:pointer;
   margin-right:10px;
 }
+button:hover{
+  background:#d95f1a;
+}
 a{
   color:#f37021;
   text-decoration:none;
 }
-a:hover{text-decoration:underline}
-.hidden{display:none}
-ul{padding-left:20px}
+a:hover{
+  text-decoration:underline;
+}
+.hidden{
+  display:none;
+}
+input,select{
+  width:100%;
+  padding:8px;
+  margin-top:10px;
+}
+ul{
+  padding-left:20px;
+}
+.nav-buttons{
+  margin-bottom:20px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h2>Référentiel Ingénierie Caténaire & Sous-stations</h2>
-  <h2>Pôle Infrastructure & Circulation</h2>
-  <p>Réalisé par Brahim Ait Lakhyar</p>
-  <p>Chargè d'ètude catènaire & sous station</p>
+  <img src="assets/oncf.png" alt="Logo ONCF">
+  <div>
+    <h1>Référentiel Ingénierie Caténaire & Sous-stations</h1>
+    <p>Réalisé par Brahim Ait Lakhyar</p>
+  </div>
 </header>
 
 <main>
 
-<!-- ===== MENU PRINCIPAL ===== -->
-<div id="menu" class="card">
-  <h2>📁 Domaines</h2>
-  <button onclick="openSection('catenaire')">Caténaire</button>
-  <button onclick="openSection('sousstation')">Sous-station</button>
+<!-- ===== CONNEXION ===== -->
+<div id="login" class="card" style="max-width:420px;margin:auto;">
+  <h2>🔐 Connexion</h2>
+  <select id="role">
+    <option value="admin">ADMIN</option>
+    <option value="pro">PROFESSIONNEL</option>
+  </select>
+  <input type="password" id="pwd" placeholder="Mot de passe">
+  <button onclick="login()">Se connecter</button>
+  <p id="err" style="color:red;"></p>
 </div>
 
-<!-- ===== CATENAIRE ===== -->
-<div id="catenaire" class="hidden">
-  <button onclick="back()">⬅ Retour</button>
+<!-- ===== APPLICATION (UNE SEULE PAGE) ===== -->
+<div id="app" class="hidden">
 
-  <div class="card">
+  <div class="nav-buttons">
+    <button onclick="showSection('catenaire')">Caténaire</button>
+    <button onclick="showSection('sousstation')">Sous-station</button>
+  </div>
+
+  <!-- ===== CATÉNAIRE ===== -->
+  <div id="catenaire" class="card hidden">
     <h2>Caténaire</h2>
 
-   <h3>📂 Manuels techniques</h3>
-<ul>
-  <li>
-    <a href="docs/catenaire/manuels-techniques/conception-cegelec.pdf" target="_blank">
-      📘 Conception CEGELEC – 3 kV
-    </a>
-  </li>
-
-  <li>
-    <a href="docs/catenaire/manuels-techniques/conception-ayesa/" target="_blank">
-      📂 Conception AYESA (ensemble des documents)
-    </a>
-  </li>
-</ul>
+    <h3>📂 Manuels techniques</h3>
+    <ul>
+      <li>
+        <a href="catenaire/manuels-techniques/conception-cegelec.pdf" target="_blank">
+          📘 Conception CEGELEC – 3 kV
+        </a>
+      </li>
+      <li>
+        <a href="catenaire/manuels-techniques/conception-ayesa/" target="_blank">
+          📂 Conception AYESA (ensemble des PDF)
+        </a>
+      </li>
+    </ul>
   </div>
-</div>
 
-<!-- ===== SOUS STATION ===== -->
-<div id="sousstation" class="hidden">
-  <button onclick="back()">⬅ Retour</button>
-
-  <div class="card">
+  <!-- ===== SOUS-STATION ===== -->
+  <div id="sousstation" class="card hidden">
     <h2>Sous-station</h2>
 
     <h3>⚡ Sous-station 3 kV</h3>
     <ul>
       <li>
-        <a href="docs/sousstation/sous-station-3kv/" target="_blank">
-          📂 Accéder aux documents
+        <a href="sousstation/sous-station-3kv/" target="_blank">
+          📂 Accéder au dossier
         </a>
       </li>
     </ul>
@@ -105,28 +145,46 @@ ul{padding-left:20px}
     <h3>⚡ Sous-station LGV</h3>
     <ul>
       <li>
-        <a href="docs/sousstation/sous-station-lgv/" target="_blank">
-          📂 Accéder aux documents
+        <a href="sousstation/sous-station-lgv/" target="_blank">
+          📂 Accéder au dossier
         </a>
       </li>
     </ul>
   </div>
+
 </div>
 
 </main>
 
 <script>
-function openSection(id){
-  document.getElementById("menu").classList.add("hidden");
-  document.getElementById(id).classList.remove("hidden");
+const PASS_ADMIN="admin123";
+const PASS_PRO="pro123";
+
+function login(){
+  const r=document.getElementById("role").value;
+  const p=document.getElementById("pwd").value;
+  if(
+    (r==="admin" && p===PASS_ADMIN) ||
+    (r==="pro" && p===PASS_PRO)
+  ){
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+  }else{
+    document.getElementById("err").innerText="Mot de passe incorrect";
+  }
 }
-function back(){
+
+function showSection(id){
   document.getElementById("catenaire").classList.add("hidden");
   document.getElementById("sousstation").classList.add("hidden");
-  document.getElementById("menu").classList.remove("hidden");
+  document.getElementById(id).classList.remove("hidden");
 }
 </script>
 
 </body>
 </html>
+
+</body>
+</html>
+
 
