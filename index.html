@@ -6,48 +6,39 @@
 
 <style>
 body{
-  font-family:"Segoe UI",Arial,sans-serif;
   margin:0;
+  font-family:Segoe UI, Arial, sans-serif;
   background:#f4f6f8;
 }
 header{
   background:#f37021;
   color:white;
-  padding:20px;
-  display:flex;
-  align-items:center;
-  gap:20px;
+  padding:30px;
 }
-header img{
-  height:70px;
-}
-header h1{
+h1{
   margin:0;
-  font-size:26px;
+  font-size:28px;
 }
-header p{
-  margin:5px 0 0;
-  font-size:14px;
+p{
+  margin:8px 0 0;
 }
 main{
-  padding:30px;
+  padding:40px;
 }
 .card{
   background:white;
-  padding:20px;
-  border-radius:8px;
-  box-shadow:0 3px 10px rgba(0,0,0,.1);
-  margin-bottom:20px;
-}
-h2,h3{
-  color:#f37021;
-  margin-top:0;
+  padding:30px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  max-width:900px;
+  margin:auto;
 }
 button{
   background:#f37021;
   color:white;
   border:none;
-  padding:10px 15px;
+  padding:12px 20px;
+  font-size:16px;
   cursor:pointer;
   margin-right:10px;
 }
@@ -57,6 +48,7 @@ button:hover{
 a{
   color:#f37021;
   text-decoration:none;
+  font-size:18px;
 }
 a:hover{
   text-decoration:underline;
@@ -64,16 +56,8 @@ a:hover{
 .hidden{
   display:none;
 }
-input,select{
-  width:100%;
-  padding:8px;
-  margin-top:10px;
-}
 ul{
-  padding-left:20px;
-}
-.nav-buttons{
-  margin-bottom:20px;
+  margin-left:20px;
 }
 </style>
 </head>
@@ -81,40 +65,24 @@ ul{
 <body>
 
 <header>
-  <img src="assets/oncf.png" alt="Logo ONCF">
-  <div>
-    <h1>Référentiel Ingénierie Caténaire & Sous-stations</h1>
-    <p>Réalisé par Brahim Ait Lakhyar</p>
-  </div>
+  <h1>Référentiel Ingénierie Caténaire & Sous-station</h1>
+  <p>Réalisé par Brahim Ait Lakhyar</p>
+  <p>Chargé d’étude caténaire & sous-station</p>
 </header>
 
 <main>
 
-<!-- ===== CONNEXION ===== -->
-<div id="login" class="card" style="max-width:420px;margin:auto;">
-  <h2>🔐 Connexion</h2>
-  <select id="role">
-    <option value="admin">ADMIN</option>
-    <option value="pro">PROFESSIONNEL</option>
-  </select>
-  <input type="password" id="pwd" placeholder="Mot de passe">
-  <button onclick="login()">Se connecter</button>
-  <p id="err" style="color:red;"></p>
-</div>
+<div class="card">
 
-<!-- ===== APPLICATION (UNE SEULE PAGE) ===== -->
-<div id="app" class="hidden">
+  <h2>📁 Domaines</h2>
+  <button onclick="show('catenaire')">Caténaire</button>
+  <button onclick="show('sousstation')">Sous-station</button>
 
-  <div class="nav-buttons">
-    <button onclick="showSection('catenaire')">Caténaire</button>
-    <button onclick="showSection('sousstation')">Sous-station</button>
-  </div>
-
-  <!-- ===== CATÉNAIRE ===== -->
-  <div id="catenaire" class="card hidden">
+  <!-- CATENAIRE -->
+  <div id="catenaire" class="hidden">
     <h2>Caténaire</h2>
 
-    <h3>📂 Manuels techniques</h3>
+    <h3>Manuels techniques</h3>
     <ul>
       <li>
         <a href="catenaire/manuels-techniques/conception-cegelec.pdf" target="_blank">
@@ -122,33 +90,17 @@ ul{
         </a>
       </li>
       <li>
-        <a href="catenaire/manuels-techniques/conception-ayesa/" target="_blank">
-          📂 Conception AYESA (ensemble des PDF)
-        </a>
+        📁 Conception AYESA (documents multiples – non listés)
       </li>
     </ul>
   </div>
 
-  <!-- ===== SOUS-STATION ===== -->
-  <div id="sousstation" class="card hidden">
+  <!-- SOUS-STATION -->
+  <div id="sousstation" class="hidden">
     <h2>Sous-station</h2>
-
-    <h3>⚡ Sous-station 3 kV</h3>
     <ul>
-      <li>
-        <a href="sousstation/sous-station-3kv/" target="_blank">
-          📂 Accéder au dossier
-        </a>
-      </li>
-    </ul>
-
-    <h3>⚡ Sous-station LGV</h3>
-    <ul>
-      <li>
-        <a href="sousstation/sous-station-lgv/" target="_blank">
-          📂 Accéder au dossier
-        </a>
-      </li>
+      <li>📁 Sous-station 3 kV (documents à venir)</li>
+      <li>📁 Sous-station LGV (documents à venir)</li>
     </ul>
   </div>
 
@@ -157,24 +109,7 @@ ul{
 </main>
 
 <script>
-const PASS_ADMIN="admin123";
-const PASS_PRO="pro123";
-
-function login(){
-  const r=document.getElementById("role").value;
-  const p=document.getElementById("pwd").value;
-  if(
-    (r==="admin" && p===PASS_ADMIN) ||
-    (r==="pro" && p===PASS_PRO)
-  ){
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-  }else{
-    document.getElementById("err").innerText="Mot de passe incorrect";
-  }
-}
-
-function showSection(id){
+function show(id){
   document.getElementById("catenaire").classList.add("hidden");
   document.getElementById("sousstation").classList.add("hidden");
   document.getElementById(id).classList.remove("hidden");
@@ -184,7 +119,9 @@ function showSection(id){
 </body>
 </html>
 
+
 </body>
 </html>
+
 
 
