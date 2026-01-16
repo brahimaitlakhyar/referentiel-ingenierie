@@ -14,9 +14,6 @@ header{
   background:#f37021;
   color:white;
   padding:20px;
-  display:flex;
-  align-items:center;
-  gap:20px;
 }
 main{
   padding:30px;
@@ -29,15 +26,19 @@ main{
   margin-bottom:20px;
 }
 h2,h3{color:#f37021;margin-top:0}
-a{color:#f37021;text-decoration:none}
-a:hover{text-decoration:underline}
 button{
   background:#f37021;
   color:white;
   border:none;
-  padding:8px 15px;
+  padding:10px 15px;
   cursor:pointer;
+  margin-right:10px;
 }
+a{
+  color:#f37021;
+  text-decoration:none;
+}
+a:hover{text-decoration:underline}
 .hidden{display:none}
 ul{padding-left:20px}
 </style>
@@ -46,10 +47,10 @@ ul{padding-left:20px}
 <body>
 
 <header>
-  <div>
-    <h2>Référentiel Ingénierie Caténaire & Sous-stations</h2>
-    <p>Réalisé par Brahim Ait Lakhyar</p>
-  </div>
+  <h2>Référentiel Ingénierie Caténaire & Sous-stations</h2>
+  <h2>Pôle Infrastructure & Circulation</h2>
+  <p>Réalisé par Brahim Ait Lakhyar</p>
+  <p>Chargè d'ètude catènaire & sous station</p>
 </header>
 
 <main>
@@ -68,29 +69,16 @@ ul{padding-left:20px}
   <div class="card">
     <h2>Caténaire</h2>
 
-    <h3>📂 Calculs</h3>
+    <h3>📂 Manuels techniques</h3>
     <ul>
       <li>
-        <a href="docs/catenaire/calculs/note_calcul_25kv.pdf" target="_blank">
-          📄 Note de calcul 25 kV
+        <a href="docs/catenaire/manuels-techniques/conception-cegelec-3kv.pdf" target="_blank">
+          📘 Conception CEGELEC – 3 kV
         </a>
       </li>
-    </ul>
-
-    <h3>📂 Schémas</h3>
-    <ul>
       <li>
-        <a href="docs/catenaire/schemas/schema_catennaire.dwg" download>
-          📐 Schéma Caténaire (DWG)
-        </a>
-      </li>
-    </ul>
-
-    <h3>📂 Normes</h3>
-    <ul>
-      <li>
-        <a href="docs/catenaire/normes/norme_oncf_catenaire.pdf" target="_blank">
-          📘 Norme ONCF Caténaire
+        <a href="docs/catenaire/manuels-techniques/conception-ayesa.pdf" target="_blank">
+          📘 Conception AYESA
         </a>
       </li>
     </ul>
@@ -104,29 +92,20 @@ ul{padding-left:20px}
   <div class="card">
     <h2>Sous-station</h2>
 
-    <h3>📂 Bilans</h3>
+    <h3>⚡ Sous-station 3 kV</h3>
     <ul>
       <li>
-        <a href="docs/sousstation/bilans/bilan_puissance.xlsx" download>
-          📊 Bilan de puissance
+        <a href="docs/sousstation/sous-station-3kv/" target="_blank">
+          📂 Accéder aux documents
         </a>
       </li>
     </ul>
 
-    <h3>📂 Schémas</h3>
+    <h3>⚡ Sous-station LGV</h3>
     <ul>
       <li>
-        <a href="docs/sousstation/schemas/schema_poste.pdf" target="_blank">
-          📄 Schéma poste
-        </a>
-      </li>
-    </ul>
-
-    <h3>📂 Rapports</h3>
-    <ul>
-      <li>
-        <a href="docs/sousstation/rapports/rapport_essais.docx" download>
-          📝 Rapport d’essais
+        <a href="docs/sousstation/sous-station-lgv/" target="_blank">
+          📂 Accéder aux documents
         </a>
       </li>
     </ul>
@@ -149,7 +128,3 @@ function back(){
 
 </body>
 </html>
-
-</body>
-</html>
-
