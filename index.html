@@ -7,135 +7,102 @@
 <style>
 body{
   margin:0;
-  font-family:Segoe UI, Arial, sans-serif;
+  font-family:Arial, sans-serif;
   background:#f4f6f8;
 }
-
-/* ===== HEADER ===== */
 header{
   background:#f37021;
   color:white;
-  padding:25px 40px;
-  display:flex;
-  align-items:center;
-  gap:25px;
+  padding:25px;
 }
-header img{
-  height:80px;   /* LOGO VISIBLE */
-}
-header h1{
-  margin:0;
-  font-size:28px;
-}
-header p{
-  margin:5px 0 0;
-  font-size:14px;
-}
-
-/* ===== MAIN ===== */
 main{
-  padding:50px;
+  padding:40px;
 }
-
-/* ===== CARD ===== */
 .card{
   background:white;
-  padding:35px;
-  border-radius:12px;
-  box-shadow:0 6px 15px rgba(0,0,0,0.1);
-  max-width:900px;
+  padding:30px;
+  border-radius:8px;
+  max-width:700px;
   margin:auto;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
-
-/* ===== BUTTONS ===== */
 button{
   background:#f37021;
   color:white;
   border:none;
-  padding:18px 28px;
-  font-size:18px;
+  padding:12px 20px;
+  font-size:16px;
   cursor:pointer;
-  margin-right:15px;
-  border-radius:6px;
+  margin-top:15px;
 }
-button:hover{
-  background:#d95f1a;
-}
-
-/* ===== LINKS ===== */
 a{
   color:#f37021;
-  text-decoration:none;
   font-size:18px;
+  text-decoration:none;
 }
-a:hover{
-  text-decoration:underline;
-}
-
-/* ===== UTILS ===== */
 .hidden{display:none}
-ul{margin-left:25px}
-h2,h3{color:#f37021}
+input,select{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <!-- LOGO ONCF -->
-  <img src="./assets/oncf.png" alt="ONCF">
-  <div>
-    <h1>Référentiel Ingénierie Caténaire & Sous-station</h1>
-     <h1>Pôle Infrastructure & Circulation</h1>
-    <p>Réalisé par Brahim Ait Lakhyar</p>
-    <p>Chargé d’étude caténaire & sous-station</p>
-  </div>
+  <h1>Référentiel Ingénierie</h1>
+  <p>Caténaire & Sous-station</p>
+  <p>Réalisé par Brahim Ait Lakhyar</p>
 </header>
 
 <main>
 
-<div class="card">
+<!-- ===== LOGIN ===== -->
+<div id="login" class="card">
+  <h2>Connexion</h2>
+  <select id="role">
+    <option value="admin">ADMIN</option>
+    <option value="pro">PROFESSIONNEL</option>
+  </select>
 
-  <h2>📁 Domaines</h2>
+  <input type="password" id="pwd" placeholder="Mot de passe">
+  <button onclick="login()">Se connecter</button>
 
-  <button onclick="showSection('catenaire')">Caténaire</button>
-  <button onclick="showSection('sousstation')">Sous-station</button>
+  <p id="err" style="color:red"></p>
+</div>
 
-  <!-- CATENAIRE -->
-  <div id="catenaire" class="hidden">
-    <h2>Caténaire</h2>
+<!-- ===== APP ===== -->
+<div id="app" class="card hidden">
 
-    <h3>Manuels techniques</h3>
-    <ul>
-      <li>
-        <a href="./catenaire/manuels-techniques/conception-cegelec.pdf" target="_blank">
-          📘 Conception CEGELEC – 3 kV
-        </a>
-      </li>
-      <li>
-        📁 Conception AYESA (plusieurs PDF)
-      </li>
-    </ul>
-  </div>
-
-  <!-- SOUS-STATION -->
-  <div id="sousstation" class="hidden">
-    <h2>Sous-station</h2>
-    <ul>
-      <li>📁 Sous-station 3 kV (documents à venir)</li>
-      <li>📁 Sous-station LGV (documents à venir)</li>
-    </ul>
-  </div>
+  <h2>Caténaire</h2>
+  <ul>
+    <li>
+      <a href="./catenaire/manuels-techniques/conception-cegelec.pdf" target="_blank">
+        📘 Conception CEGELEC – 3 kV
+      </a>
+    </li>
+  </ul>
 
 </div>
 
 </main>
 
 <script>
-function showSection(id){
-  document.getElementById("catenaire").classList.add("hidden");
-  document.getElementById("sousstation").classList.add("hidden");
-  document.getElementById(id).classList.remove("hidden");
+function login(){
+  const r = document.getElementById("role").value;
+  const p = document.getElementById("pwd").value;
+
+  if(
+    (r==="admin" && p==="admin123") ||
+    (r==="pro" && p==="pro123")
+  ){
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+  }else{
+    document.getElementById("err").innerText="Mot de passe incorrect";
+  }
 }
 </script>
 
@@ -148,6 +115,7 @@ function showSection(id){
 
 </body>
 </html>
+
 
 
 
