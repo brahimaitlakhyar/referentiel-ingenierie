@@ -1,96 +1,143 @@
- box-shadow:0 3px 8px rgba(0,0,0,.1);
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Référentiel Ingénierie</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI, Arial;
+  background:#f4f6f8;
+}
+header{
+  background:#f37021;
+  color:white;
+  padding:25px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+header img{
+  height:80px;
+}
+.card{
+  background:white;
+  padding:25px;
+  border-radius:10px;
+  box-shadow:0 3px 8px rgba(0,0,0,.1);
   border-top:5px solid #f37021;
+  margin-bottom:20px;
+}
+main{
+  padding:40px;
 }
 button{
   background:#f37021;
   color:white;
   border:none;
-  padding:8px;
+  padding:10px 15px;
   cursor:pointer;
+  border-radius:5px;
 }
+button:hover{background:#d85f1c}
 .hidden{display:none}
 ul{padding-left:20px}
-a{color:#f37021;text-decoration:none}
+a{color:#f37021;text-decoration:none;font-size:18px}
 a:hover{text-decoration:underline}
+select,input{
+  padding:8px;
+  margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <img src="assets/oncf.png">
+  <img src="./assets/oncf.png" alt="ONCF">
   <div>
     <h2>Référentiel Ingénierie Caténaire & Sous-stations</h2>
-    <h2>Pôle infrastructure & circulation</h2>
+    <p>Pôle infrastructure & circulation</p>
     <p>Réalisé par Brahim Ait Lakhyar</p>
-    <p>Chargè d'ètude catènaire & sous station</p>
+    <p>Chargé d'étude caténaire & sous station</p>
   </div>
 </header>
 
 <!-- ===== CONNEXION ===== -->
 <div class="card" id="loginBox" style="max-width:380px;margin:40px auto;">
   <h3>🔐 Connexion</h3>
+
   <select id="role">
     <option value="admin">ADMIN</option>
     <option value="pro">PROFESSIONNEL</option>
   </select>
+
   <input type="password" id="password" placeholder="Mot de passe">
-  <button id="loginBtn">Se connecter</button>
+  <br><br>
+  <button onclick="login()">Se connecter</button>
   <p id="msg" style="color:red"></p>
 </div>
 
 <!-- ===== MENU ===== -->
 <main id="menu" class="hidden">
-  <div class="card" onclick="openSection('catenaire')"><h3>📁 Caténaire</h3></div>
-  <div class="card" onclick="openSection('sousstation')"><h3>⚡ Sous-station</h3></div>
+  <div class="card" onclick="openSection('catenaire')">
+    <h3>📁 Caténaire</h3>
+  </div>
+  <div class="card" onclick="openSection('sousstation')">
+    <h3>⚡ Sous-station</h3>
+  </div>
 </main>
 
 <!-- ===== CATENAIRE ===== -->
 <main id="catenaire" class="hidden">
   <button onclick="back()">⬅ Retour</button>
 
-  <div class="card hidden" id="addCat">
-    <input type="file" id="fileCat">
-    <button onclick="addDoc('cat')">Ajouter</button>
-  </div>
-
   <div class="card">
-    <h3>Documents Caténaire</h3>
-    <ul id="listCat"></ul>
+    <h3>📁 Manuels techniques – Caténaire</h3>
+    <ul>
+      <li>
+        📂
+        <a href="./catenaire/manuel-technique/conception-cegelec/" target="_blank">
+          Conception CEGELEC – 3 kV
+        </a>
+      </li>
+      <li>
+        📂
+        <a href="./catenaire/manuel-technique/conception-ayesa/" target="_blank">
+          Conception AYESA
+        </a>
+      </li>
+    </ul>
   </div>
 </main>
 
-<!-- ===== SOUS STATION ===== -->
+<!-- ===== SOUS-STATION ===== -->
 <main id="sousstation" class="hidden">
   <button onclick="back()">⬅ Retour</button>
 
-  <div class="card hidden" id="addSous">
-    <input type="file" id="fileSous">
-    <button onclick="addDoc('sous')">Ajouter</button>
-  </div>
-
   <div class="card">
-    <h3>Documents Sous-station</h3>
-    <ul id="listSous"></ul>
+    <h3>⚡ Sous-station</h3>
+    <ul>
+      <li>
+        📂
+        <a href="./sousstation/" target="_blank">
+          Accéder aux dossiers Sous-station
+        </a>
+      </li>
+    </ul>
   </div>
 </main>
 
 <script>
 const PASS={admin:"admin123",pro:"pro123"};
 
-loginBtn.onclick=()=>{
+function login(){
   if(PASS[role.value]===password.value){
-    localStorage.role=role.value;
     loginBox.classList.add("hidden");
     menu.classList.remove("hidden");
-    applyRole();
-  }else msg.textContent="Mot de passe incorrect";
-};
-
-function applyRole(){
-  if(localStorage.role==="admin"){
-    addCat.classList.remove("hidden");
-    addSous.classList.remove("hidden");
+  }else{
+    msg.textContent="Mot de passe incorrect";
   }
 }
 
@@ -103,29 +150,6 @@ function back(){
   document.querySelectorAll("main").forEach(m=>m.classList.add("hidden"));
   menu.classList.remove("hidden");
 }
-
-function addDoc(type){
-  if(localStorage.role!=="admin") return;
-
-  const input = type==="cat"?fileCat:fileSous;
-  if(!input.files.length) return;
-
-  const file=input.files[0];
-  const url=URL.createObjectURL(file);
-
-  const li=document.createElement("li");
-  li.innerHTML=`📄 <a href="${url}" download="${file.name}">${file.name}</a>`;
-
-  if(type==="cat") listCat.appendChild(li);
-  else listSous.appendChild(li);
-
-  input.value="";
-}
-</script>
-
-</body>
-</html>
-
 </script>
 
 </body>
@@ -133,6 +157,7 @@ function addDoc(type){
 
 </body>
 </html>
+
 
 
 
