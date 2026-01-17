@@ -1,109 +1,131 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Référentiel Ingénierie</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#f4f6f8;
-}
-header{
-  background:#f37021;
-  color:white;
-  padding:25px;
-}
-main{
-  padding:40px;
-}
-.card{
-  background:white;
-  padding:30px;
-  border-radius:8px;
-  max-width:700px;
-  margin:auto;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+ box-shadow:0 3px 8px rgba(0,0,0,.1);
+  border-top:5px solid #f37021;
 }
 button{
   background:#f37021;
   color:white;
   border:none;
-  padding:12px 20px;
-  font-size:16px;
+  padding:8px;
   cursor:pointer;
-  margin-top:15px;
-}
-a{
-  color:#f37021;
-  font-size:18px;
-  text-decoration:none;
 }
 .hidden{display:none}
-input,select{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-}
+ul{padding-left:20px}
+a{color:#f37021;text-decoration:none}
+a:hover{text-decoration:underline}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>Référentiel Ingénierie</h1>
-  <p>Caténaire & Sous-station</p>
-  <p>Réalisé par Brahim Ait Lakhyar</p>
+  <img src="assets/oncf.png">
+  <div>
+    <h2>Référentiel Ingénierie Caténaire & Sous-stations</h2>
+    <h2>Pôle infrastructure & circulation</h2>
+    <p>Réalisé par Brahim Ait Lakhyar</p>
+    <p>Chargè d'ètude catènaire & sous station</p>
+  </div>
 </header>
 
-<main>
-
-<!-- ===== LOGIN ===== -->
-<div id="login" class="card">
-  <h2>Connexion</h2>
+<!-- ===== CONNEXION ===== -->
+<div class="card" id="loginBox" style="max-width:380px;margin:40px auto;">
+  <h3>🔐 Connexion</h3>
   <select id="role">
     <option value="admin">ADMIN</option>
     <option value="pro">PROFESSIONNEL</option>
   </select>
-
-  <input type="password" id="pwd" placeholder="Mot de passe">
-  <button onclick="login()">Se connecter</button>
-
-  <p id="err" style="color:red"></p>
+  <input type="password" id="password" placeholder="Mot de passe">
+  <button id="loginBtn">Se connecter</button>
+  <p id="msg" style="color:red"></p>
 </div>
 
-<!-- ===== APP ===== -->
-<div id="app" class="card hidden">
+<!-- ===== MENU ===== -->
+<main id="menu" class="hidden">
+  <div class="card" onclick="openSection('catenaire')"><h3>📁 Caténaire</h3></div>
+  <div class="card" onclick="openSection('sousstation')"><h3>⚡ Sous-station</h3></div>
+</main>
 
-  <h2>Caténaire</h2>
-  <ul>
-    <li>
-      <a href="./catenaire/manuels-techniques/conception-cegelec.pdf" target="_blank">
-        📘 Conception CEGELEC – 3 kV
-      </a>
-    </li>
-  </ul>
+<!-- ===== CATENAIRE ===== -->
+<main id="catenaire" class="hidden">
+  <button onclick="back()">⬅ Retour</button>
 
-</div>
+  <div class="card hidden" id="addCat">
+    <input type="file" id="fileCat">
+    <button onclick="addDoc('cat')">Ajouter</button>
+  </div>
 
+  <div class="card">
+    <h3>Documents Caténaire</h3>
+    <ul id="listCat"></ul>
+  </div>
+</main>
+
+<!-- ===== SOUS STATION ===== -->
+<main id="sousstation" class="hidden">
+  <button onclick="back()">⬅ Retour</button>
+
+  <div class="card hidden" id="addSous">
+    <input type="file" id="fileSous">
+    <button onclick="addDoc('sous')">Ajouter</button>
+  </div>
+
+  <div class="card">
+    <h3>Documents Sous-station</h3>
+    <ul id="listSous"></ul>
+  </div>
 </main>
 
 <script>
-function login(){
-  const r = document.getElementById("role").value;
-  const p = document.getElementById("pwd").value;
+const PASS={admin:"admin123",pro:"pro123"};
 
-  if(
-    (r==="admin" && p==="admin123") ||
-    (r==="pro" && p==="pro123")
-  ){
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-  }else{
-    document.getElementById("err").innerText="Mot de passe incorrect";
+loginBtn.onclick=()=>{
+  if(PASS[role.value]===password.value){
+    localStorage.role=role.value;
+    loginBox.classList.add("hidden");
+    menu.classList.remove("hidden");
+    applyRole();
+  }else msg.textContent="Mot de passe incorrect";
+};
+
+function applyRole(){
+  if(localStorage.role==="admin"){
+    addCat.classList.remove("hidden");
+    addSous.classList.remove("hidden");
   }
 }
+
+function openSection(id){
+  menu.classList.add("hidden");
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function back(){
+  document.querySelectorAll("main").forEach(m=>m.classList.add("hidden"));
+  menu.classList.remove("hidden");
+}
+
+function addDoc(type){
+  if(localStorage.role!=="admin") return;
+
+  const input = type==="cat"?fileCat:fileSous;
+  if(!input.files.length) return;
+
+  const file=input.files[0];
+  const url=URL.createObjectURL(file);
+
+  const li=document.createElement("li");
+  li.innerHTML=`📄 <a href="${url}" download="${file.name}">${file.name}</a>`;
+
+  if(type==="cat") listCat.appendChild(li);
+  else listSous.appendChild(li);
+
+  input.value="";
+}
+</script>
+
+</body>
+</html>
+
 </script>
 
 </body>
@@ -111,6 +133,7 @@ function login(){
 
 </body>
 </html>
+
 
 
 
