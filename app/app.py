@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request, redirect, session, send_from_directory, send_file
+from flask import (
+    Flask, render_template, request,
+    redirect, session, send_from_directory, send_file
+)
 import os
 import shutil
 import zipfile
@@ -19,15 +22,13 @@ USERS = {
     "pro": "pro123"
 }
 
+
 def list_dir(base, subpath=""):
     path = os.path.join(base, subpath)
     items = []
     for name in sorted(os.listdir(path)):
         full = os.path.join(path, name)
-        items.append({
-            "name": name,
-            "is_dir": os.path.isdir(full)
-        })
+        items.append({"name": name, "is_dir": os.path.isdir(full)})
     return items
 
 
@@ -50,20 +51,16 @@ def browse(section, path):
 
     base = os.path.join(UPLOADS, section)
     current = os.path.join(base, path)
-
     if not os.path.exists(current):
         return redirect("/")
-
-    items = list_dir(base, path)
-    parent = "/".join(path.split("/")[:-1]) if path else ""
 
     return render_template(
         "index.html",
         role=session.get("role"),
         section=section,
-        items=items,
+        items=list_dir(base, path),
         path=path,
-        parent=parent
+        parent="/".join(path.split("/")[:-1]) if path else ""
     )
 
 
@@ -72,51 +69,57 @@ def create_folder():
     if session.get("role") != "admin":
         return redirect("/")
 
-    section = request.form["section"]
-    path = request.form.get("path", "")
-    name = request.form["name"]
-
-    os.makedirs(os.path.join(UPLOADS, section, path, name), exist_ok=True)
+    os.makedirs(
+        os.path.join(
+            UPLOADS,
+            request.form["section"],
+            request.form.get("path", ""),
+            request.form["name"]
+        ),
+        exist_ok=True
+    )
     return redirect(request.referrer)
 
 
 @app.route("/upload", methods=["POST"])
-def upload():
+def upload_file():
     if session.get("role") != "admin":
         return redirect("/")
 
-    section = request.form["section"]
-    path = request.form.get("path", "")
     file = request.files["file"]
-
     if file:
-        dest = os.path.join(UPLOADS, section, path)
+        dest = os.path.join(
+            UPLOADS,
+            request.form["section"],
+            request.form.get("path", "")
+        )
         file.save(os.path.join(dest, file.filename))
-
     return redirect(request.referrer)
 
 
-# ✅ UPLOAD DOSSIER COMPLET
+# ✅ UPLOAD DOSSIER COMPLET (AVEC SOUS-DOSSIERS)
 @app.route("/upload-folder", methods=["POST"])
 def upload_folder():
     if session.get("role") != "admin":
         return redirect("/")
 
     section = request.form["section"]
-    path = request.form.get("path", "")
+    base_path = request.form.get("path", "")
     files = request.files.getlist("files")
-
-    base_dest = os.path.join(UPLOADS, section, path)
 
     for file in files:
         if not file.filename:
             continue
 
-        rel_path = file.filename.replace("\\", "/")
-        dest_path = os.path.join(base_dest, rel_path)
-
-        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-        file.save(dest_path)
+        relative_path = file.filename.replace("\\", "/")
+        dest_dir = os.path.join(
+            UPLOADS,
+            section,
+            base_path,
+            os.path.dirname(relative_path)
+        )
+        os.makedirs(dest_dir, exist_ok=True)
+        file.save(os.path.join(dest_dir, os.path.basename(relative_path)))
 
     return redirect(request.referrer)
 
@@ -125,38 +128,13 @@ def upload_folder():
 def delete():
     if session.get("role") != "admin":
         return redirect("/")
-@app.route("/upload-folder", methods=["POST"])
-def upload_folder():
-    if session.get("role") != "admin":
-        return redirect("/")
 
-    section = request.form["section"]
-    base_path = request.form.get("path", "")
-
-    files = request.files.getlist("files")
-
-    for file in files:
-        if file.filename == "":
-            continue
-
-        relative_path = file.filename.replace("\\", "/")
-
-        dest_dir = os.path.join(
-            UPLOADS,
-            section,
-            base_path,
-            os.path.dirname(relative_path)
-        )
-
-        os.makedirs(dest_dir, exist_ok=True)
-        file.save(os.path.join(dest_dir, os.path.basename(relative_path)))
-
-    return redirect(request.referrer)
-    section = request.form["section"]
-    path = request.form.get("path", "")
-    name = request.form["name"]
-
-    target = os.path.join(UPLOADS, section, path, name)
+    target = os.path.join(
+        UPLOADS,
+        request.form["section"],
+        request.form.get("path", ""),
+        request.form["name"]
+    )
 
     if os.path.isdir(target):
         shutil.rmtree(target)
@@ -177,11 +155,10 @@ def download_zip(section, path):
     memory = BytesIO()
 
     with zipfile.ZipFile(memory, "w", zipfile.ZIP_DEFLATED) as z:
-        for root, dirs, files in os.walk(base):
+        for root, _, files in os.walk(base):
             for f in files:
-                full_path = os.path.join(root, f)
-                arcname = os.path.relpath(full_path, base)
-                z.write(full_path, arcname)
+                full = os.path.join(root, f)
+                z.write(full, os.path.relpath(full, base))
 
     memory.seek(0)
     return send_file(memory, download_name=f"{path}.zip", as_attachment=True)
