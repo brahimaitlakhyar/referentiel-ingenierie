@@ -1,0 +1,17 @@
+# Environnements
+venv/
+__pycache__/
+*.pyc
+
+# Uploads (docs utilisateurs)
+uploads/
+
+# Build / exe / dist
+dist/
+build/
+*.exe
+app/dist/
+
+# OS
+.DS_Store
+Thumbs.db

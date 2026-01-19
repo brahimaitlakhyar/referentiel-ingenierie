@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Sous-station</title></head>
+<body>
+
+<h1>SOUS-STATION</h1>
+<a href="/menu/{{ role }}">⬅ Retour</a>
+
+{% if role == "admin" %}
+<form method="post" action="/create_folder">
+<input type="hidden" name="base" value="sousstation">
+<input name="name" placeholder="Nom dossier">
+<button>Créer dossier</button>
+</form>
+
+<form method="post" action="/upload" enctype="multipart/form-data">
+<input type="hidden" name="base" value="sousstation">
+<input type="file" name="file">
+<button>Uploader</button>
+</form>
+{% endif %}
+
+<ul>
+{% for i in items %}
+<li>
+<a href="/files/sousstation/{{ i }}">{{ i }}</a>
+</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>

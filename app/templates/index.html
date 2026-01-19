@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Référentiel Ingénierie</title>
+<style>
+body{font-family:Arial;background:#f4f6f8;margin:0}
+header{background:#f37021;color:white;padding:20px;display:flex;gap:20px}
+header img{height:70px}
+main{padding:30px}
+.card{background:white;padding:20px;margin-bottom:20px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,.1)}
+button{background:#f37021;color:white;border:none;padding:7px 12px;border-radius:5px;cursor:pointer}
+input{padding:6px}
+a{color:#f37021;text-decoration:none}
+.danger{background:#c0392b}
+</style>
+</head>
+
+<body>
+<header>
+  <img src="/static/oncf.png">
+  <div>
+    <h2>Référentiel Ingénierie Caténaire & Sous-stations</h2>
+    <p>Pôle Infrastructure & Circulation</p>
+    <p><b>Brahim Ait Lakhyar</b> – Chargé d’étude caténaire & sous-station</p>
+  </div>
+</header>
+
+<main>
+
+{% if not role %}
+<div class="card" style="max-width:400px;margin:auto">
+<form method="post">
+<select name="role">
+<option value="admin">ADMIN</option>
+<option value="pro">PRO</option>
+</select>
+<input type="password" name="password" placeholder="Mot de passe">
+<button>Connexion</button>
+</form>
+</div>
+
+{% elif not section %}
+<div class="card">
+<h3>📁 <a href="/browse/catenaire/">Caténaire</a></h3>
+</div>
+<div class="card">
+<h3>⚡ <a href="/browse/sousstation/">Sous-station</a></h3>
+</div>
+<p><a href="/logout">Déconnexion</a></p>
+
+{% else %}
+<div class="card">
+<h3>{{ section.upper() }} / {{ path }}</h3>
+
+{% if parent %}
+<a href="/browse/{{ section }}/{{ parent }}">⬅ Retour</a><br><br>
+{% endif %}
+
+{% if role=="admin" %}
+<form method="post" action="/create-folder">
+<input type="hidden" name="section" value="{{ section }}">
+<input type="hidden" name="path" value="{{ path }}">
+<input name="name" placeholder="Nom dossier">
+<button>Créer dossier</button>
+</form>
+
+<form method="post" action="/upload" enctype="multipart/form-data">
+<input type="hidden" name="section" value="{{ section }}">
+<input type="hidden" name="path" value="{{ path }}">
+<input type="file" name="file">
+<button>Ajouter fichier</button>
+</form>
+{% endif %}
+
+<ul>
+{% for i in items %}
+<li>
+{% if i.is_dir %}
+📁 <a href="/browse/{{ section }}/{{ path }}/{{ i.name }}">{{ i.name }}</a>
+{% else %}
+📄 <a href="/files/{{ section }}/{{ path }}/{{ i.name }}">{{ i.name }}</a>
+{% endif %}
+{% if role=="admin" %}
+<form method="post" action="/delete" style="display:inline">
+<input type="hidden" name="section" value="{{ section }}">
+<input type="hidden" name="path" value="{{ path }}">
+<input type="hidden" name="name" value="{{ i.name }}">
+<button class="danger">✖</button>
+</form>
+{% endif %}
+</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+
+</main>
+</body>
+</html>

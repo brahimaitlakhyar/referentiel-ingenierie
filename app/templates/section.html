@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>{{ section|capitalize }}</title>
+
+<style>
+body{font-family:Arial;background:#f5f5f5;margin:0}
+header{background:#f37021;color:white;padding:20px;display:flex;gap:20px}
+header img{height:60px}
+.container{max-width:1100px;margin:30px auto;background:white;padding:20px;
+box-shadow:0 4px 10px rgba(0,0,0,.1);border-top:6px solid #f37021}
+a{text-decoration:none;color:#f37021}
+button{background:#f37021;color:white;border:none;padding:7px 12px;cursor:pointer}
+input{padding:6px}
+ul{list-style:none;padding-left:0}
+li{margin:8px 0}
+.search{width:100%;margin-bottom:15px;padding:8px}
+.admin{background:#fff3ea;padding:15px;margin-bottom:20px;border-radius:8px}
+.icon{font-weight:bold;margin-right:6px}
+</style>
+
+<script>
+function filterList(){
+  let q = document.getElementById("search").value.toLowerCase();
+  document.querySelectorAll("li").forEach(li=>{
+    li.style.display = li.innerText.toLowerCase().includes(q) ? "" : "none";
+  });
+}
+</script>
+
+</head>
+<body>
+
+<header>
+  <img src="/static/oncf.png">
+  <div>
+    <h2>Référentiel Ingénierie Caténaire & Sous-stations</h2>
+    <p>Pôle Infrastructure & Circulation</p>
+    <p>Brahim Ait Lakhyar – Chargé d’étude</p>
+  </div>
+</header>
+
+<div class="container">
+
+<a href="/">← Retour</a>
+<h2>{{ section|capitalize }}</h2>
+
+<input id="search" class="search" placeholder="🔍 Rechercher..." onkeyup="filterList()">
+
+{% if role=="admin" %}
+<div class="admin">
+<form method="post" action="/create-folder">
+<input type="hidden" name="section" value="{{ section }}">
+<input type="hidden" name="path" value="{{ path }}">
+<input name="name" placeholder="Nom dossier" required>
+<button>Créer dossier</button>
+</form>
+
+<br>
+
+<form method="post" action="/upload" enctype="multipart/form-data">
+<input type="hidden" name="section" value="{{ section }}">
+<input type="hidden" name="path" value="{{ path }}">
+<input type="file" name="file" required>
+<button>Uploader fichier</button>
+</form>
+</div>
+{% endif %}
+
+{% if path %}
+<a href="/download-zip/{{ section }}/{{ path }}">📦 Télécharger ce dossier (ZIP)</a>
+<br><br>
+{% endif %}
+
+<ul>
+{% if parent %}
+<li>📁 <a href="/browse/{{ section }}/{{ parent }}">..</a></li>
+{% endif %}
+
+{% for i in items %}
+<li>
+{% if i.is_dir %}
+<span class="icon">📁</span>
+<a href="/browse/{{ section }}/{{ path }}/{{ i.name }}">{{ i.name }}</a>
+{% else %}
+{% set ext = i.name.split('.')[-1].lower() %}
+{% if ext=="pdf" %}📕
+{% elif ext in ["dwg","dxf"] %}📐
+{% elif ext in ["xls","xlsx","doc","docx"] %}📊
+{% elif ext=="zip" %}🗜️
+{% else %}📄
+{% endif %}
+<a href="/files/{{ section }}/{{ path }}/{{ i.name }}" target="_blank">{{ i.name }}</a>
+{% endif %}
+
+{% if role=="admin" %}
+<form method="post" action="/delete" style="display:inline">
+<input type="hidden" name="section" value="{{ section }}">
+<input type="hidden" name="path" value="{{ path }}">
+<input type="hidden" name="name" value="{{ i.name }}">
+<button>❌</button>
+</form>
+{% endif %}
+</li>
+{% endfor %}
+</ul>
+
+</div>
+</body>
+</html>
