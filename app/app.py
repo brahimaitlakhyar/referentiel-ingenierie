@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, redirect, session, send_from_directory
+from flask import Flask, render_template, request, redirect, session, send_from_directory, send_file
 import os
 import shutil
+import zipfile
+from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = "oncf-secret"
@@ -11,9 +13,6 @@ UPLOADS = os.path.join(BASE_DIR, "uploads")
 # Création des dossiers principaux
 for section in ["catenaire", "sousstation"]:
     os.makedirs(os.path.join(UPLOADS, section), exist_ok=True)
-from werkzeug.security import generate_password_hash
-
-print(generate_password_hash("admin123"))
 
 USERS = {
     "admin": "admin123",
@@ -31,17 +30,17 @@ def list_dir(base, subpath=""):
         })
     return items
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         role = request.form["role"]
         password = request.form["password"]
-
         if role in USERS and USERS[role] == password:
             session["role"] = role
             return redirect("/")
-
     return render_template("index.html", role=session.get("role"))
+
 
 @app.route("/browse/<section>/", defaults={"path": ""})
 @app.route("/browse/<section>/<path:path>")
@@ -59,13 +58,14 @@ def browse(section, path):
     parent = "/".join(path.split("/")[:-1]) if path else ""
 
     return render_template(
-        "section.html",
+        "index.html",
         role=session.get("role"),
         section=section,
         items=items,
         path=path,
         parent=parent
     )
+
 
 @app.route("/create-folder", methods=["POST"])
 def create_folder():
@@ -76,9 +76,9 @@ def create_folder():
     path = request.form.get("path", "")
     name = request.form["name"]
 
-    base = os.path.join(UPLOADS, section, path)
-    os.makedirs(os.path.join(base, name), exist_ok=True)
+    os.makedirs(os.path.join(UPLOADS, section, path, name), exist_ok=True)
     return redirect(request.referrer)
+
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -95,11 +95,63 @@ def upload():
 
     return redirect(request.referrer)
 
+
+# ✅ UPLOAD DOSSIER COMPLET
+@app.route("/upload-folder", methods=["POST"])
+def upload_folder():
+    if session.get("role") != "admin":
+        return redirect("/")
+
+    section = request.form["section"]
+    path = request.form.get("path", "")
+    files = request.files.getlist("files")
+
+    base_dest = os.path.join(UPLOADS, section, path)
+
+    for file in files:
+        if not file.filename:
+            continue
+
+        rel_path = file.filename.replace("\\", "/")
+        dest_path = os.path.join(base_dest, rel_path)
+
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+        file.save(dest_path)
+
+    return redirect(request.referrer)
+
+
 @app.route("/delete", methods=["POST"])
 def delete():
     if session.get("role") != "admin":
         return redirect("/")
+@app.route("/upload-folder", methods=["POST"])
+def upload_folder():
+    if session.get("role") != "admin":
+        return redirect("/")
 
+    section = request.form["section"]
+    base_path = request.form.get("path", "")
+
+    files = request.files.getlist("files")
+
+    for file in files:
+        if file.filename == "":
+            continue
+
+        relative_path = file.filename.replace("\\", "/")
+
+        dest_dir = os.path.join(
+            UPLOADS,
+            section,
+            base_path,
+            os.path.dirname(relative_path)
+        )
+
+        os.makedirs(dest_dir, exist_ok=True)
+        file.save(os.path.join(dest_dir, os.path.basename(relative_path)))
+
+    return redirect(request.referrer)
     section = request.form["section"]
     path = request.form.get("path", "")
     name = request.form["name"]
@@ -113,17 +165,11 @@ def delete():
 
     return redirect(request.referrer)
 
+
 @app.route("/files/<section>/<path:path>")
 def files(section, path):
     return send_from_directory(os.path.join(UPLOADS, section), path)
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
-import zipfile
-from io import BytesIO
-from flask import send_file
 
 @app.route("/download-zip/<section>/<path:path>")
 def download_zip(section, path):
@@ -141,6 +187,11 @@ def download_zip(section, path):
     return send_file(memory, download_name=f"{path}.zip", as_attachment=True)
 
 
-if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=1000)
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
 
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=1000)
